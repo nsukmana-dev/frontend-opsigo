@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tambah pegawai</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+
+<h3 style="color: green;">Test Nandar - Tambah pegawai</h3>
+
+<label for="fname">NIP:</label><br>
+<input type="text" value="" name="Nip" id="Nip"><br>
+
+<label for="fname">Nama Lengkap:</label><br>
+<input type="text" value="" name="NamaLengkap" id="NamaLengkap"><br>
+
+<label for="fname">Alamat:</label><br>
+<textarea name="TempatLahir" id="TempatLahir" cols="30" rows="3"></textarea><br>
+
+<label for="fname">Tanggal Lahir:</label><br>
+<input type="date" value="" name="TanggalLahir" id="TanggalLahir"><br>
+
+<label for="fname">Atasan:</label><br>
+<select name="Atasan" id="Atasan">
+
+</select><br>
+
+<label for="fname">Status:</label><br>
+<select name="Status" id="Status">
+<option value="Tetap">Tetap</option>
+<option value="Kontrak">Kontrak</option>
+<option value="Keluar">Keluar</option>
+</select><br><br>
+
+<input type="button" value="Submit" style="background-color: aqua;" onclick="submit()">
+
+
+</body>
+<script>
+$(document).ready(function(){
+    $.getJSON("http://localhost:8080/api/v1/atasan", function(result){
+        $.each(result['data'], function(i, field){
+        $("#Atasan").append("<option>"+field["NamaLengkap"]+"</option>");
+        });
+    });
+});
+
+function submit(){
+    var Nip = $("#Nip").val();
+    var NamaLengkap = $("#NamaLengkap").val();
+    var TempatLahir = $("#TempatLahir").val();
+    var TanggalLahir = $("#TanggalLahir").val();
+    var Atasan = $("#Atasan").val();
+    var Status = $("#Status").val();
+    
+    if (Nip == "") {
+        alert("NIP tidak boleh kosong");
+        return
+    }
+
+    if (NamaLengkap == "") {
+        alert("Nama Lengkap tidak boleh kosong");
+        return
+    }
+
+    if (TempatLahir == "") {
+        alert("Tempat Lahir tidak boleh kosong");
+        return
+    }
+
+    if (TanggalLahir == "") {
+        alert("Tanggal Lahir tidak boleh kosong");
+        return
+    }
+
+    if (Atasan == "") {
+        alert("Atasan tidak boleh kosong");
+        return
+    }
+
+    if (Status == "") {
+        alert("Status tidak boleh kosong");
+        return
+    }
+    $.post("http://localhost:8080/api/v1/add", {
+        Nip: Nip,
+        NamaLengkap: NamaLengkap,
+        TempatLahir: TempatLahir,
+        TanggalLahir: TanggalLahir,
+        Atasan: Atasan,
+        Status: Status,
+    }, function(result){
+        if (result['status'] == 'berhasil ngepost'){
+            alert('post berhasil');
+            window.location.href = 'index.html';
+        }else{
+            alert(result['message']);
+        }
+    });
+}
+</script>
+</html>

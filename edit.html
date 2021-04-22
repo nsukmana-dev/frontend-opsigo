@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit pegawai</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+
+<h3 style="color: green;">Test Nandar - Tambah pegawai</h3>
+
+<label for="fname">NIP:</label><br>
+<input type="text" value="" name="Nip" id="Nip"><br>
+
+<label for="fname">Nama Lengkap:</label><br>
+<input type="text" value="" name="NamaLengkap" id="NamaLengkap">
+<input type="hidden" value="" name="NamaLengkap" id="hidename"><br>
+
+<label for="fname">Alamat:</label><br>
+<textarea name="TempatLahir" id="TempatLahir" cols="30" rows="3"></textarea><br>
+
+<label for="fname">Tanggal Lahir:</label><br>
+<input type="date" value="" name="TanggalLahir" id="TanggalLahir"><br>
+
+<label for="fname">Atasan:</label><br>
+<select name="Atasan" id="Atasan">
+  
+</select><br>
+
+<label for="fname">Status:</label><br>
+<select name="Status" id="Status">
+<option value="Tetap">Tetap</option>
+<option value="Kontrak">Kontrak</option>
+<option value="Keluar">Keluar</option>
+</select><br><br>
+
+<input type="button" value="Submit" style="background-color: aqua;" onclick="submit()">
+
+
+</body>
+<script>
+  var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+  
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+  
+        if (sParameterName[0] === sParam) {
+            return typeof sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+    return false;
+  };
+  $(document).ready(function(){
+      var idUser = getUrlParameter('id');
+      $.getJSON("http://localhost:8080/api/v1/edit/"+idUser, function(result){
+        
+        //$.each(result['data'], function(i, field){
+          var todayTime = new Date(result['data']["TanggalLahir"]);
+          var month = ( '0' + (todayTime.getMonth()+1) ).slice( -2 );
+          var day = ( '0' + (todayTime.getDate()) ).slice( -2 );
+          var year = todayTime.getFullYear();
+          $("#Nip").val(result['data']["Nip"]);
+          $("#NamaLengkap").val(result['data']["NamaLengkap"]);
+          $("#hidename").val(result['data']["Atasan"]);
+          $("#TempatLahir").val(result['data']["TempatLahir"]);
+          $("#TanggalLahir").val(year+"-"+month+"-"+day);
+          $("#Atasan").val(result['data']["Atasan"]);
+          $("#Status").val(result['data']["Status"]);
+          //$("#append").append(field["ID"]+" "+field["NamaLengkap"]+" - "+field["TempatLahir"]+"<br>");
+        //});
+      });
+  });
+  setTimeout(setop, 1000);
+  function setop(){
+    var namahide = $("#hidename").val();
+    var idUser = getUrlParameter('id');
+    //alert(namahide);
+    $.getJSON("http://localhost:8080/api/v1/atasanbyid/"+idUser, function(res){
+      $.each(res['data'], function(i, field){
+        if(namahide == field["NamaLengkap"]){
+          $("#Atasan").append("<option selected='selected'>"+field["NamaLengkap"]+"</option>");
+        }else{
+          $("#Atasan").append("<option>"+field["NamaLengkap"]+"</option>");
+        }
+      });
+    });
+  }
+</script>
+<script>
+function submit(){
+  var idUser = getUrlParameter('id');
+  var Nip = $("#Nip").val();
+  var NamaLengkap = $("#NamaLengkap").val();
+  var TempatLahir = $("#TempatLahir").val();
+  var TanggalLahir = $("#TanggalLahir").val();
+  var Atasan = $("#Atasan").val();
+  var Status = $("#Status").val();
+  
+  if (Nip == "") {
+      alert("NIP tidak boleh kosong");
+      return
+  }
+
+  if (NamaLengkap == "") {
+      alert("Nama Lengkap tidak boleh kosong");
+      return
+  }
+
+  if (TempatLahir == "") {
+      alert("Tempat Lahir tidak boleh kosong");
+      return
+  }
+
+  if (TanggalLahir == "") {
+      alert("Tanggal Lahir tidak boleh kosong");
+      return
+  }
+
+  if (Atasan == "") {
+      alert("Atasan tidak boleh kosong");
+      return
+  }
+
+  if (Status == "") {
+      alert("Status tidak boleh kosong");
+      return
+  }
+  $.ajax({
+    url: "http://localhost:8080/api/v1/update/"+idUser,
+    type: 'PUT',
+    data: {
+      Nip: Nip,
+      NamaLengkap: NamaLengkap,
+      TempatLahir: TempatLahir,
+      TanggalLahir: TanggalLahir,
+      Atasan: Atasan,
+      Status: Status,
+    }, 
+    success: function (result) {
+      if (result['status'] == 'berhasil update'){
+        alert('update berhasil');
+      }else{
+          alert(result['message']);
+      }
+    }
+  });
+  
+}
+</script>
+</html>
